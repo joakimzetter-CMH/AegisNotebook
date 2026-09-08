@@ -1,0 +1,103 @@
+-- Migration 29: guard fn::vector_search against rows with a NULL embedding
+-- (AegisNotebook). Migration 28 added `embedding != none AND` for
+-- generated_document only; source_embedding/source_insight/note never got
+-- the same guard. vector::similarity::cosine() raises "expected a array but
+-- found NONE" the moment it's evaluated against any row whose embedding is
+-- NONE (e.g. a source_insight created before its embed command completed) -
+-- and since SurrealQL evaluates the function call before short-circuiting
+-- the surrounding AND, one such row breaks vector_search for every caller,
+-- not just the notebook it belongs to.
+
+REMOVE FUNCTION IF EXISTS fn::vector_search;
+
+DEFINE FUNCTION IF NOT EXISTS fn::vector_search($query: array<float>, $match_count: int, $sources: bool, $show_notes: bool, $min_similarity: float, $notebook_ids: option<array<string>>) {
+    let $source_embedding_search =
+        IF $sources {(
+            SELECT
+                source.id as id,
+                source.title as title,
+                content,
+                source.id as parent_id,
+                vector::similarity::cosine(embedding, $query) as similarity
+            FROM source_embedding
+            WHERE embedding != none
+                AND vector::similarity::cosine(embedding, $query) >= $min_similarity
+                AND ($notebook_ids == NONE OR array::len($notebook_ids) = 0
+                     OR source.id IN (SELECT VALUE in FROM reference WHERE <string>out IN $notebook_ids))
+            ORDER BY similarity DESC
+            LIMIT $match_count
+        )}
+        ELSE { [] };
+
+    let $source_insight_search =
+        IF $sources {(
+            SELECT
+                id,
+                insight_type + ' - ' + (source.title OR '') as title,
+                content,
+                source.id as parent_id,
+                vector::similarity::cosine(embedding, $query) as similarity
+            FROM source_insight
+            WHERE embedding != none
+                AND vector::similarity::cosine(embedding, $query) >= $min_similarity
+                AND ($notebook_ids == NONE OR array::len($notebook_ids) = 0
+                     OR source.id IN (SELECT VALUE in FROM reference WHERE <string>out IN $notebook_ids))
+            ORDER BY similarity DESC
+            LIMIT $match_count
+        )}
+        ELSE { [] };
+
+
+    let $note_content_search =
+        IF $show_notes {(
+            SELECT
+                id,
+                title,
+                content,
+                id as parent_id,
+                vector::similarity::cosine(embedding, $query) as similarity
+            FROM note
+            WHERE embedding != none
+                AND vector::similarity::cosine(embedding, $query) >= $min_similarity
+                AND ($notebook_ids == NONE OR array::len($notebook_ids) = 0
+                     OR id IN (SELECT VALUE in FROM artifact WHERE <string>out IN $notebook_ids))
+            ORDER BY similarity DESC
+            LIMIT $match_count
+        )}
+        ELSE { [] };
+
+
+    let $generated_document_search =
+        IF $sources {(
+            SELECT
+                id,
+                title,
+                content,
+                id as parent_id,
+                vector::similarity::cosine(embedding, $query) as similarity
+            FROM generated_document
+            WHERE embedding != none
+                AND vector::similarity::cosine(embedding, $query) >= $min_similarity
+                AND ($notebook_ids == NONE OR array::len($notebook_ids) = 0
+                     OR id IN (SELECT VALUE in FROM compiled_from WHERE <string>out IN $notebook_ids))
+            ORDER BY similarity DESC
+            LIMIT $match_count
+        )}
+        ELSE { [] };
+
+
+    let $all_results = array::union(
+        array::union(
+            array::union($source_embedding_search, $source_insight_search),
+            $note_content_search
+        ),
+        $generated_document_search
+    );
+
+
+    RETURN (select id, parent_id, title, math::max(similarity) as similarity,
+    array::flatten(content) as matches
+    from $all_results where id is not None
+    group by id, parent_id, title ORDER BY similarity DESC LIMIT $match_count);
+
+};

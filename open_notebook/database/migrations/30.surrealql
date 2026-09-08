@@ -1,0 +1,52 @@
+-- Migration 30: skill + skill_knowledge tables (AegisNotebook)
+-- A Skill bundles reusable operating instructions (like a Transformation's
+-- prompt, but with no source to run against) with its own small embedded
+-- knowledge base. Unlike source/note, skill_knowledge has no notebook owner
+-- at all - it's meant to be retrievable from any notebook's chat, so
+-- fn::skill_search below never takes a notebook filter.
+
+DEFINE TABLE IF NOT EXISTS skill SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS name ON TABLE skill TYPE string;
+DEFINE FIELD IF NOT EXISTS title ON TABLE skill TYPE string;
+DEFINE FIELD IF NOT EXISTS description ON TABLE skill TYPE string;
+DEFINE FIELD IF NOT EXISTS instructions ON TABLE skill TYPE string;
+DEFINE FIELD IF NOT EXISTS enabled ON TABLE skill TYPE bool DEFAULT true;
+DEFINE FIELD IF NOT EXISTS created ON skill DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD IF NOT EXISTS updated ON skill DEFAULT time::now() VALUE time::now();
+
+DEFINE TABLE IF NOT EXISTS skill_knowledge SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS skill ON TABLE skill_knowledge TYPE record<skill>;
+DEFINE FIELD IF NOT EXISTS title ON TABLE skill_knowledge TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS order ON TABLE skill_knowledge TYPE int;
+DEFINE FIELD IF NOT EXISTS content ON TABLE skill_knowledge TYPE string;
+DEFINE FIELD IF NOT EXISTS embedding ON TABLE skill_knowledge TYPE option<array<float>>;
+DEFINE FIELD IF NOT EXISTS created ON skill_knowledge DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD IF NOT EXISTS updated ON skill_knowledge DEFAULT time::now() VALUE time::now();
+
+DEFINE EVENT IF NOT EXISTS skill_delete ON TABLE skill WHEN ($after == NONE) THEN {
+    delete skill_knowledge where skill == $before.id;
+};
+
+DEFINE ANALYZER IF NOT EXISTS my_analyzer TOKENIZERS blank,class,camel,punct FILTERS snowball(english), lowercase;
+DEFINE INDEX IF NOT EXISTS idx_skill_knowledge_content ON TABLE skill_knowledge COLUMNS content SEARCH ANALYZER my_analyzer BM25 HIGHLIGHTS;
+
+DEFINE FUNCTION IF NOT EXISTS fn::skill_search($query: array<float>, $match_count: int, $min_similarity: float) {
+    let $skill_knowledge_search = (
+        SELECT
+            skill.id as parent_id,
+            skill.title as title,
+            content,
+            vector::similarity::cosine(embedding, $query) as similarity
+        FROM skill_knowledge
+        WHERE embedding != none
+            AND skill.enabled = true
+            AND vector::similarity::cosine(embedding, $query) >= $min_similarity
+        ORDER BY similarity DESC
+        LIMIT $match_count
+    );
+
+    RETURN (select parent_id, title, math::max(similarity) as similarity,
+    array::flatten(content) as matches
+    from $skill_knowledge_search where parent_id is not None
+    group by parent_id, title ORDER BY similarity DESC LIMIT $match_count);
+};

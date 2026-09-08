@@ -1,0 +1,4 @@
+-- Migration 26 rollback: remove research_session table and its scopes edge
+
+REMOVE TABLE IF EXISTS scopes;
+REMOVE TABLE IF EXISTS research_session;

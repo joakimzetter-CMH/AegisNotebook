@@ -1,0 +1,5 @@
+-- Migration 27 rollback: remove generated_document table and its compiled_from edge
+
+REMOVE INDEX IF EXISTS idx_generated_document_content ON TABLE generated_document;
+REMOVE TABLE IF EXISTS compiled_from;
+REMOVE TABLE IF EXISTS generated_document;

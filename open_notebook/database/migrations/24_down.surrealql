@@ -1,0 +1,4 @@
+-- Migration 24 rollback: remove embedding fingerprint cache fields
+
+REMOVE FIELD IF EXISTS fingerprint ON TABLE source;
+REMOVE FIELD IF EXISTS last_embedded_fingerprint ON TABLE source;

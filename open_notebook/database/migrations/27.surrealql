@@ -1,0 +1,22 @@
+-- Migration 27: generated_document table (AegisNotebook)
+-- Not a Note (single-notebook-owned) or SourceInsight (tied to one source) -
+-- a generated document can be compiled from MULTIPLE notebooks via the
+-- `compiled_from` edge (many-to-many, mirrors sources' `reference` edge).
+-- Carries its own single embedding (like `note`) so it's retrievable by the
+-- global Ask once fn::vector_search is extended for it (see migration 28).
+
+DEFINE TABLE IF NOT EXISTS generated_document SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS title ON TABLE generated_document TYPE string;
+DEFINE FIELD IF NOT EXISTS content ON TABLE generated_document TYPE string;
+DEFINE FIELD IF NOT EXISTS version ON TABLE generated_document TYPE int DEFAULT 1;
+DEFINE FIELD IF NOT EXISTS language ON TABLE generated_document TYPE string DEFAULT 'bilingual';
+DEFINE FIELD IF NOT EXISTS status ON TABLE generated_document TYPE string DEFAULT 'draft';
+DEFINE FIELD IF NOT EXISTS source_session ON TABLE generated_document TYPE option<record<research_session>>;
+DEFINE FIELD IF NOT EXISTS embedding ON TABLE generated_document TYPE option<array<float>>;
+DEFINE FIELD IF NOT EXISTS created ON generated_document DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD IF NOT EXISTS updated ON generated_document DEFAULT time::now() VALUE time::now();
+
+DEFINE TABLE IF NOT EXISTS compiled_from TYPE RELATION FROM generated_document TO notebook;
+
+DEFINE ANALYZER IF NOT EXISTS my_analyzer TOKENIZERS blank,class,camel,punct FILTERS snowball(english), lowercase;
+DEFINE INDEX IF NOT EXISTS idx_generated_document_content ON TABLE generated_document COLUMNS content SEARCH ANALYZER my_analyzer BM25 HIGHLIGHTS;

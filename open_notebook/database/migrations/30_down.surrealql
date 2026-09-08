@@ -1,0 +1,7 @@
+-- Migration 30 rollback: remove skill and skill_knowledge tables
+
+REMOVE FUNCTION IF EXISTS fn::skill_search;
+REMOVE INDEX IF EXISTS idx_skill_knowledge_content ON TABLE skill_knowledge;
+REMOVE EVENT IF EXISTS skill_delete ON TABLE skill;
+REMOVE TABLE IF EXISTS skill_knowledge;
+REMOVE TABLE IF EXISTS skill;

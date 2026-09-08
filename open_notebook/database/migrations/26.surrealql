@@ -1,0 +1,14 @@
+-- Migration 26: research_session table (AegisNotebook)
+-- A research_session can span MULTIPLE notebooks via the `scopes` edge
+-- (many-to-many), unlike chat_session's single-notebook `refers_to`. This
+-- keeps the existing single-notebook chat feature untouched (every current
+-- chat_session consumer assumes exactly one related notebook via
+-- `refers_to`) while giving cross-notebook sessions their own home.
+
+DEFINE TABLE IF NOT EXISTS research_session SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS title ON TABLE research_session TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS model_override ON TABLE research_session TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS created ON research_session DEFAULT time::now() VALUE $before OR time::now();
+DEFINE FIELD IF NOT EXISTS updated ON research_session DEFAULT time::now() VALUE time::now();
+
+DEFINE TABLE IF NOT EXISTS scopes TYPE RELATION FROM research_session TO notebook;

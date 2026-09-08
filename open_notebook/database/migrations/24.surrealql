@@ -1,0 +1,7 @@
+-- Migration 24: Embedding fingerprint cache for sources (AegisNotebook)
+-- Lets embed_source_command skip re-chunking/re-embedding a source whose
+-- underlying content hasn't changed since it was last embedded, instead of
+-- unconditionally deleting and rebuilding source_embedding on every call.
+
+DEFINE FIELD IF NOT EXISTS fingerprint ON TABLE source TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS last_embedded_fingerprint ON TABLE source TYPE option<string>;

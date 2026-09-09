@@ -1,6 +1,6 @@
 # Notebooks, Sources, and Notes - The Container Model
 
-Open Notebook organizes research in three connected layers. Understanding this hierarchy is key to using the system effectively.
+AegisNotebook organizes research in three connected layers. Understanding this hierarchy is key to using the system effectively.
 
 ## The Three-Layer Structure
 
@@ -43,7 +43,9 @@ Think of it like a physical notebook: everything inside is about the same topic,
 
 ### Why This Matters
 
-**Isolation**: Each notebook is completely separate. Sources in Notebook A never appear in Notebook B. This lets you:
+**Default scope**: Each notebook is its own research context. Sources are only
+retrieved in the notebooks they are linked to, unless you explicitly use a
+cross-notebook feature such as a Research Session. This lets you:
 - Keep different research topics completely isolated
 - Reuse source names across notebooks without conflicts
 - Control which AI context applies to which research
@@ -103,11 +105,15 @@ A **source** is a *single piece of input material* — the raw content you bring
 
 ### Key Properties
 
-**Immutable**: Once added, the source doesn't change. If you need a new version, add it as a new source.
+**Evidence-oriented**: A source is persisted as the research evidence you
+added, while metadata and processing can be updated. A content change gets a
+new fingerprint so its embeddings can be rebuilt instead of being reused.
 
 **Indexed**: Sources are automatically indexed for search (both text and semantic).
 
-**Scoped**: A source belongs to exactly one notebook.
+**Scoped**: A source can be linked to one or more notebooks. Search and
+research sessions use these relationships to control which material is in
+scope.
 
 **Referenceable**: Other sources and notes can reference this source by citation.
 
@@ -204,12 +210,17 @@ YOU
 
 ## Key Design Decisions
 
-### 1. One Notebook Per Source
+### 1. Notebook-scoped, reusable sources
 
-Each source belongs to exactly one notebook. This creates clear boundaries:
-- No ambiguity about which research project a source is in
-- Easy to isolate or export a complete project
-- Clean permissions model (if someone gets access to notebook, they get access to all its sources)
+Sources are linked to notebooks through `reference` relationships. A source can
+therefore be reused across projects without re-uploading it. A notebook still
+defines the default research boundary, while a research session can explicitly
+combine several notebooks.
+
+This provides:
+- Clear project boundaries through notebook-scoped retrieval
+- Reuse of common evidence across projects
+- Explicit control over which notebooks contribute to a cross-notebook session
 
 ### 2. Immutable Sources, Mutable Notes
 
@@ -255,17 +266,22 @@ Think of notes like your case brief:
 
 ## Common Questions
 
-### Can I move a source to a different notebook?
-Not directly. Each source is tied to one notebook. If you want it in multiple notebooks, add it again (uploads are fast if it's already processed).
+### Can I use a source in more than one notebook?
+Yes. Add the existing source to another notebook. The source is stored once and
+linked through another `reference` relationship.
 
 ### Can a note reference sources from a different notebook?
-No. Notes stay within their notebook and reference sources within that notebook. This keeps boundaries clean.
+Notes are linked to notebooks through `artifact` relationships. Cross-notebook
+research should normally use a Research Session, which scopes retrieval across
+the selected notebooks and stores generated documents separately from notes.
 
 ### What if I want to group sources within a notebook?
 Use tags. You can tag sources ("primary research," "background," "methodology") and filter by tags.
 
 ### Can I merge two notebooks?
-Not built-in, but you can manually copy sources from one notebook to another by re-uploading them.
+There is no destructive merge operation. For temporary or focused work, create a
+Research Session and select both notebooks. For a permanent organization,
+link existing sources to the target notebook and review notes separately.
 
 ---
 
@@ -274,11 +290,12 @@ Not built-in, but you can manually copy sources from one notebook to another by 
 | Concept | Purpose | Lifecycle | Scope |
 |---------|---------|-----------|-------|
 | **Notebook** | Container + context | Create once, configure | All its sources + notes |
-| **Source** | Raw material | Add → Process → Store | One notebook |
+| **Source** | Raw material | Add → Process → Store | One or more notebooks |
 | **Note** | Processed output | Create/capture → Edit → Share | One notebook |
 
-This three-layer model gives you:
+This model, extended with Research Sessions, gives you:
 - **Clear organization** (everything scoped to projects)
 - **Privacy control** (isolated notebooks)
 - **Audit trails** (notes cite sources)
 - **Flexibility** (notes can be manual or AI-generated)
+- **Cross-project synthesis** (one session can use several notebooks)

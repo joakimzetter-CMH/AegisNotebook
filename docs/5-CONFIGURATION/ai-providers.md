@@ -2,13 +2,13 @@
 
 Complete setup instructions for each AI provider via the **Settings UI**.
 
-> **New in v1.2**: All AI provider credentials are now managed through the Settings UI. Environment variables for API keys are deprecated.
+> **Current behavior**: AI provider credentials are managed through the Settings UI. Environment variables for API keys remain a fallback, but are deprecated.
 
 ---
 
 ## How Provider Setup Works
 
-Open Notebook uses a **credential-based system** for managing AI providers:
+AegisNotebook uses a **credential-based system** for managing AI providers:
 
 1. **Get your API key** from the provider's website
 2. **Open Settings** → **API Keys** → **Add Credential**
@@ -32,7 +32,7 @@ Open Notebook uses a **credential-based system** for managing AI providers:
 3. Create new API key (starts with "sk-proj-")
 4. Add $5+ credits to account
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **OpenAI**
@@ -42,7 +42,7 @@ Open Notebook uses a **credential-based system** for managing AI providers:
 7. Click **Discover Models** to find available models
 8. Click **Register Models** to make them available
 
-**Available Models (in Open Notebook):**
+**Available Models (in AegisNotebook):**
 - `gpt-4o` — Best quality, fast (latest version)
 - `gpt-4o-mini` — Fast, cheap, good for testing
 - `o1` — Advanced reasoning model (slower, more expensive)
@@ -77,7 +77,7 @@ Heavy use: $50-100+/month
 3. Go to API keys section
 4. Create new API key (starts with "sk-ant-")
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **Anthropic**
@@ -138,7 +138,7 @@ Only language models are supported for Anthropic-compatible credentials.
 2. Create account or login
 3. Create new API key
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **Google Gemini**
@@ -178,7 +178,7 @@ Only language models are supported for Anthropic-compatible credentials.
 2. Create account or login
 3. Create new API key
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **Groq**
@@ -222,7 +222,7 @@ Only language models are supported for Anthropic-compatible credentials.
 3. Add credits to your account
 4. Create new API key
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **OpenRouter**
@@ -282,7 +282,7 @@ Heavy use: Depends on models chosen
 3. Navigate to API Keys section
 4. Create a new API key
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **DashScope (Qwen)**
@@ -316,7 +316,7 @@ Heavy use: Depends on models chosen
 3. Navigate to API Keys section
 4. Create a new API key
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **MiniMax**
@@ -351,7 +351,7 @@ Heavy use: Depends on models chosen
 2. Create an account (if needed)
 3. Create a new API key
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **Cohere**
@@ -365,7 +365,7 @@ Heavy use: Depends on models chosen
 
 **Notes:**
 - Cohere uses its native v2 API (`/v2/chat`, `/v2/embed`), not an OpenAI-compatible endpoint.
-- Reranking is not yet available in Open Notebook (tracked separately).
+- Reranking is not yet available in AegisNotebook (tracked separately).
 
 **Troubleshooting:**
 - "Invalid API key" → Check the key in the Cohere dashboard
@@ -382,7 +382,7 @@ Heavy use: Depends on models chosen
 2. Create an account (if needed)
 3. Create a new API key
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **Novita**
@@ -408,7 +408,7 @@ Heavy use: Depends on models chosen
 2. Create an account (if needed)
 3. Create a new API key
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **PayPerQ**
@@ -437,7 +437,7 @@ Heavy use: Depends on models chosen
 2. Run Ollama in background: `ollama serve`
 3. Download a model: `ollama pull mistral`
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **Ollama**
@@ -522,11 +522,11 @@ CPU-only:
    ```
 3. Load models in the oMLX admin UI
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **oMLX**
-4. Base URL defaults to `http://localhost:11435/v1` (use `http://host.docker.internal:11435/v1` if Open Notebook is in Docker)
+4. Base URL defaults to `http://localhost:11435/v1` (use `http://host.docker.internal:11435/v1` if AegisNotebook is in Docker)
 5. API key is optional (only if you started oMLX with `--api-key`)
 6. Click **Save**, then **Test Connection** → **Discover Models** → **Register Models**
 
@@ -545,7 +545,7 @@ See [oMLX Setup Guide](omlx.md) for port conflict details and troubleshooting.
 4. Go to "Local Server" tab
 5. Start server (default port: 1234)
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Go to **Settings** → **API Keys**
 2. Click **Add Credential**
 3. Select provider: **OpenAI-Compatible**
@@ -589,7 +589,7 @@ See [OpenAI-Compatible Setup](openai-compatible.md) for detailed instructions.
 
 **Cost:** Same as OpenAI (usage-based)
 
-**Configure in Open Notebook:**
+**Configure in AegisNotebook:**
 1. Create Azure OpenAI service in Azure portal
 2. Deploy GPT-4/3.5-turbo model
 3. Get your endpoint and key
@@ -614,7 +614,7 @@ See [OpenAI-Compatible Setup](openai-compatible.md) for detailed instructions.
 
 ## Embeddings (For Search/Semantic Features)
 
-By default, Open Notebook uses the LLM provider's embeddings. Embedding models are discovered and registered through the same credential system — when you discover models from a credential, embedding models are included alongside language models.
+By default, AegisNotebook uses the LLM provider's embeddings. Embedding models are discovered and registered through the same credential system — when you discover models from a credential, embedding models are included alongside language models.
 
 ---
 

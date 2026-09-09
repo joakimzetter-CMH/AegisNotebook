@@ -19,7 +19,7 @@ docker ps | grep api
 # Step 2: Verify port 5055 is accessible
 curl http://localhost:5055/health
 
-# Expected output: {"status":"ok"}
+# Expected output: {"status":"healthy"}
 
 # If that doesn't work:
 # Step 3: Restart services

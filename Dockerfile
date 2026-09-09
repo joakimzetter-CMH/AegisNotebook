@@ -8,10 +8,22 @@
 FROM node:22-slim AS frontend-builder
 WORKDIR /app/frontend
 
+# Trust the corporate TLS-inspecting proxy's root CA so npm can reach the
+# registry from inside the build (same cert the host needs via
+# NODE_EXTRA_CA_CERTS — see corp-ca-bundle.pem at the repo root). Machine-local,
+# not a secret; not portable to a network without this proxy.
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+COPY corp-ca-bundle.pem /usr/local/share/ca-certificates/corp-ca-bundle.crt
+RUN update-ca-certificates
+ENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+
 # Copy dependency files first to leverage cache
 COPY frontend/package.json frontend/package-lock.json ./
 ARG NPM_REGISTRY=https://registry.npmjs.org/
+ARG NPM_STRICT_SSL=true
 RUN npm config set registry ${NPM_REGISTRY} \
+ && npm config set strict-ssl ${NPM_STRICT_SSL} \
  && npm config set fetch-retries 5 \
  && npm config set fetch-retry-mintimeout 20000 \
  && npm config set fetch-retry-maxtimeout 120000
@@ -33,6 +45,7 @@ FROM python:3.12-slim-trixie AS backend-builder
 # Install build dependencies (uv downloads pre-built wheels for most packages)
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     build-essential \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv using the official method
@@ -46,13 +59,26 @@ ENV PYTHONUNBUFFERED=1
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 ENV UV_HTTP_TIMEOUT=120
+# Use the container's CA store. This is required on environments where uv's
+# bundled certificate bundle does not recognise the active network certificate.
+ENV UV_SYSTEM_CERTS=true
 
 # Copy dependency files and minimal package structure first for better layer caching
 COPY pyproject.toml uv.lock ./
 COPY open_notebook/__init__.py ./open_notebook/__init__.py
 
 # Install dependencies (this layer is cached unless dependencies change)
-RUN uv sync --frozen --no-dev
+# Some managed networks (for example Zscaler) re-sign package downloads with a
+# local CA that is unavailable inside Docker. Pass UV_INSECURE_HOST only for a
+# local build in that environment; it is not persisted in the runtime image.
+ARG UV_INSECURE_HOST=
+RUN if [ -n "${UV_INSECURE_HOST}" ]; then \
+      uv sync --allow-insecure-host files.pythonhosted.org \
+              --allow-insecure-host pypi.org \
+              --frozen --no-dev; \
+    else \
+      uv sync --frozen --no-dev; \
+    fi
 
 # Pre-download tiktoken encoding so the app works offline (issue #264).
 # /app/tiktoken-cache is intentionally outside /app/data/ so that volume mounts

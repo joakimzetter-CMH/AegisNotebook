@@ -1,6 +1,6 @@
-# User Guide - How to Use Open Notebook
+# User Guide - How to Use AegisNotebook
 
-This guide covers practical, step-by-step usage of Open Notebook features. You already understand the concepts; now learn how to actually use them.
+This guide covers practical, step-by-step usage of AegisNotebook features. You already understand the concepts; now learn how to actually use them.
 
 > **Prerequisite**: Review [2-CORE-CONCEPTS](../2-CORE-CONCEPTS/index.md) first to understand the mental models (notebooks, sources, notes, chat, transformations, podcasts).
 
@@ -13,7 +13,7 @@ Learn the layout before diving in. Understand the three-panel design and where e
 
 ---
 
-## Eight Core Features
+## Core Features
 
 ### 1. [Adding Sources](adding-sources.md)
 How to bring content into your notebook. Supports PDFs, web links, audio, video, text, and more.
@@ -109,6 +109,11 @@ Configure AI provider API keys directly through the Settings UI.
 - Manage Azure and OpenAI-compatible providers
 - Understand key storage and encryption
 
+### 9. [Research Sessions](../2-CORE-CONCEPTS/research-sessions.md)
+
+Connect multiple notebooks, ask scoped questions and generate or refine a
+versioned document in one session.
+
 ---
 
 ## Which Feature for Which Task?
@@ -128,6 +133,9 @@ Task: "I want summaries of all my sources"
 
 Task: "I want to share my research in audio form"
 → Use: Podcasts (create speakers, generate episode)
+
+Task: "I want to combine several notebooks into one deliverable"
+→ Use: Research Sessions (ask questions, then generate or refine a document)
 
 Task: "I want to find that quote I remember"
 → Use: Search / Text Search (keyword matching)

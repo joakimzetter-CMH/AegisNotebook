@@ -1,6 +1,6 @@
-# Open Notebook Windows Installation Guide (Native, No Docker)
+# AegisNotebook Windows Installation Guide (Native, No Docker)
 
-This guide documents how to install and run [Open Notebook](https://github.com/lfnovo/open-notebook) on Windows **natively without Docker or WSL**.
+This guide documents how to install and run [AegisNotebook](../../README.md) on Windows **natively without Docker or WSL**.
 
 ## Who Is This For?
 
@@ -21,7 +21,7 @@ This guide documents how to install and run [Open Notebook](https://github.com/l
 | ------------ | -------------------------------- | -------- |
 | Git          | `winget install Git.Git`         | Yes      |
 | Python 3.12+ | Via uv (installed automatically) | Yes      |
-| Node.js 18+  | `winget install OpenJS.NodeJS`   | Yes      |
+| Node.js 20+  | `winget install OpenJS.NodeJS`   | Yes      |
 | uv           | `pip install uv`                 | Yes      |
 | SurrealDB    | `scoop install surrealdb`        | Yes      |
 
@@ -31,8 +31,8 @@ This guide documents how to install and run [Open Notebook](https://github.com/l
 
    ```bash
    cd %USERPROFILE%\Projects  # or your preferred location
-   git clone https://github.com/lfnovo/open-notebook.git
-   cd open-notebook
+   git clone <repository-url> AegisNotebook
+   cd AegisNotebook
    uv sync
    cd frontend && npm install && cd ..
    ```
@@ -49,14 +49,14 @@ This guide documents how to install and run [Open Notebook](https://github.com/l
      SURREAL_URL="ws://127.0.0.1:8000/rpc"
      ```
 
-3. **Start the four services**, each in its own terminal, from the `open-notebook` folder.
+3. **Start the four services**, each in its own terminal, from the `AegisNotebook` folder.
 
-   > Open Notebook does not ship a launcher script — start the services manually as below (or wrap them in your own `.bat`, see [Optional: one-click launcher](#optional-one-click-launcher)).
+   > **Optional Docker-assisted startup:** AegisNotebook includes [`scripts/windows/Start-AegisNotebook.ps1`](../../scripts/windows/Start-AegisNotebook.ps1), which starts Docker Desktop, SurrealDB, the API, the worker and the frontend. That launcher is separate from this native path; use the manual commands below to run without Docker and to keep separate consoles for debugging.
 
    ```batch
-   REM Optional: point Open Notebook at a separate data folder (see Issue 4 below).
+   REM Optional: point AegisNotebook at a separate data folder (see Issue 4 below).
    REM Set this in each terminal before running, or skip to use ./data.
-   set DATA_FOLDER=%USERPROFILE%\Projects\open-notebook-data
+   set DATA_FOLDER=%USERPROFILE%\Projects\aegis-notebook-data
 
    REM Terminal 1 — SurrealDB
    surreal start --user root --pass root --bind 127.0.0.1:8000 rocksdb:%DATA_FOLDER%\surrealdb
@@ -78,31 +78,37 @@ This guide documents how to install and run [Open Notebook](https://github.com/l
 
 ```
 YourProjectsFolder\
-├── open-notebook\           # Source code (git clone)
+├── AegisNotebook\           # Source code (git clone)
 │   ├── .venv\               # Python virtual environment (created by uv)
 │   ├── frontend\            # Next.js frontend
 │   ├── commands\            # Worker command modules
 │   └── .env                 # Your configuration
-├── open-notebook-data\      # Data storage (SEPARATE from code!)
+├── aegis-notebook-data\     # Data storage (SEPARATE from code!)
 │   ├── surrealdb\           # Database files
 │   ├── uploads\             # Uploaded documents
 │   └── sqlite-db\           # LangGraph checkpoints
-└── start-open-notebook.bat  # Optional launcher you create yourself (see below)
+└── start-aegis-notebook.bat # Optional launcher you create yourself (see below)
 ```
 
 **Why separate data folder?** Prevents accidental data loss when updating/reinstalling code.
 
-## Optional: one-click launcher
+## One-click launcher
 
-Open Notebook does not ship a launcher, but you can save the following as
-`start-open-notebook.bat` (anywhere you like) to start all four services with a
-double-click. Adjust `ROOT` and `DATA_ROOT` to match your setup.
+AegisNotebook ships a PowerShell launcher for the complete development stack:
+
+```powershell
+.\scripts\windows\Start-AegisNotebook.ps1 -OpenBrowser
+```
+
+It is idempotent and writes logs under `%LOCALAPPDATA%\AegisNotebook\logs`.
+For a custom setup, you can still save the following as
+`start-aegis-notebook.bat` and adjust `ROOT` and `DATA_ROOT`.
 
 ```batch
 @echo off
 REM --- adjust these two paths ---
-set ROOT=%USERPROFILE%\Projects\open-notebook
-set DATA_ROOT=%USERPROFILE%\Projects\open-notebook-data
+set ROOT=%USERPROFILE%\Projects\AegisNotebook
+set DATA_ROOT=%USERPROFILE%\Projects\aegis-notebook-data
 
 set DATA_FOLDER=%DATA_ROOT%
 set PYTHONPATH=%ROOT%
@@ -192,7 +198,7 @@ warning: Failed to parse environment file .env at position X
 **Solution:** Keep `DATA_FOLDER` **commented out** in `.env`. Set it via batch file:
 
 ```batch
-set DATA_FOLDER=C:\path\to\open-notebook-data
+set DATA_FOLDER=C:\path\to\aegis-notebook-data
 ```
 
 ## Configuration Files
@@ -242,7 +248,7 @@ Once running, add models in Settings. Common model names:
 When a new version is released:
 
 ```batch
-cd open-notebook
+cd AegisNotebook
 git pull
 uv sync
 cd frontend && npm install && cd ..
@@ -281,5 +287,5 @@ Found another Windows-specific issue? Please share your solution!
 
 ---
 
-*Tested on Windows 11 ARM64 with Open Notebook v1.6.0*
+*Tested on Windows 11 ARM64 with AegisNotebook v1.6.0*
 *Created: January 2026*

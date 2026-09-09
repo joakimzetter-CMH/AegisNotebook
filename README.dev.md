@@ -22,7 +22,7 @@ Developer documentation now lives in the development docs structure.
 ## TL;DR
 
 ```bash
-git clone https://github.com/lfnovo/open-notebook.git && cd open-notebook
+git clone <repository-url> AegisNotebook && cd AegisNotebook
 cp .env.example .env
 uv sync
 make start-all    # SurrealDB + API + worker + frontend

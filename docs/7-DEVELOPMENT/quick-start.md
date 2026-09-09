@@ -1,6 +1,6 @@
-# Quick Start - Development
+# Quick Start - AegisNotebook Development
 
-Get Open Notebook running locally in 5 minutes.
+Get AegisNotebook running locally in 5 minutes.
 
 ## Prerequisites
 
@@ -13,10 +13,10 @@ Get Open Notebook running locally in 5 minutes.
 
 ```bash
 # Fork the repository on GitHub first, then clone your fork
-git clone https://github.com/YOUR_USERNAME/open-notebook.git
-cd open-notebook
+git clone <repository-url> AegisNotebook
+cd AegisNotebook
 
-# Add upstream remote for updates
+# If this is a fork, optionally add the upstream remote for reference
 git remote add upstream https://github.com/lfnovo/open-notebook.git
 ```
 
@@ -43,15 +43,18 @@ make database
 make api
 # or: uv run --env-file .env uvicorn api.main:app --host 0.0.0.0 --port 5055
 
-# Terminal 3: Start Frontend (UI on port 3000)
+# Terminal 3: Start background worker (required for processing and embeddings)
+uv run --env-file .env surreal-commands-worker --import-modules commands
+
+# Terminal 4: Start Frontend (UI on port 3000)
 cd frontend && npm run dev
 ```
 
 ## 4. Verify Everything Works (instant)
 
-- **API Health**: http://localhost:5055/health → should return `{"status": "ok"}`
+- **API Health**: http://localhost:5055/health → should return `{"status": "healthy"}`
 - **API Docs**: http://localhost:5055/docs → interactive API documentation
-- **Frontend**: http://localhost:3000 → Open Notebook UI
+- **Frontend**: http://localhost:3000 → AegisNotebook UI
 
 **All three show up?** ✅ You're ready to develop!
 

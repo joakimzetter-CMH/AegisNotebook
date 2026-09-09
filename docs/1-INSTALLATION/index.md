@@ -97,7 +97,7 @@ Choose your installation route based on your setup and use case.
 
 Before installing, you'll need:
 
-- [ ] **Docker** (for Docker routes) or **Node.js 18+** (for source)
+- [ ] **Docker** (for Docker routes) or **Node.js 20+** (for source)
 - [ ] **AI Provider API key** (OpenAI, Anthropic, etc.) OR willingness to use free local models
 - [ ] **At least 4GB RAM** available
 - [ ] **Stable internet** (or offline setup with Ollama)
@@ -113,7 +113,7 @@ Before installing, you'll need:
 4. Access at `http://localhost:8502`
 
 ### For Source Installation (Developers)
-1. Have Python 3.11+, Node.js 18+, Git installed
+1. Have Python 3.11+, Node.js 20+, Git installed
 2. Follow [From Source](from-source.md)
 3. Run `make start-all`
 4. Access at `http://localhost:8502` (frontend) or `http://localhost:5055` (API)

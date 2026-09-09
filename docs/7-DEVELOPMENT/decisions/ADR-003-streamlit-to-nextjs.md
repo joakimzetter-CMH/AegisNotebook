@@ -22,5 +22,5 @@ Rebuild the frontend as a **Next.js/React application** consuming the same FastA
 
 - The API is complete by construction — anything the UI does, an integration can do (this later enabled the MCP direction, #878).
 - Two build systems and a larger contributor surface (TypeScript + Python).
-- i18n, theming and accessibility became first-class frontend concerns (7 locales today).
+- i18n, theming and accessibility became first-class frontend concerns (15 locales today).
 - Legacy Streamlit remnants were removed over time; migrations assume API-driven access.

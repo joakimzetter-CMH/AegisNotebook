@@ -1,8 +1,15 @@
 # AI Providers - Comparison & Selection Guide
 
-Open Notebook supports 17+ AI providers. This guide helps you **choose the right provider** for your needs.
+AegisNotebook supports 22 AI providers and compatible endpoints. This guide helps you **choose the right provider** for your needs.
 
 > 💡 **Just want to set up a provider?** Skip to the [Configuration Guide](../5-CONFIGURATION/ai-providers.md) for detailed setup instructions.
+
+The runtime provider registry currently contains: OpenAI, Anthropic, Google,
+Groq, Mistral, DeepSeek, xAI, OpenRouter, DashScope, MiniMax, Novita, PayPerQ,
+Cohere, Voyage, ElevenLabs, Deepgram, Ollama, oMLX, Azure OpenAI, Google Vertex
+AI, OpenAI Compatible and Anthropic Compatible. The UI reads this registry from
+`GET /api/providers`, so the list and display order have one backend source of
+truth.
 
 ---
 
@@ -247,7 +254,7 @@ Any use: Free (electricity only)
 2. **Follow the setup guide**: [AI Providers Configuration](../5-CONFIGURATION/ai-providers.md)
 3. **Add your credential** in Settings → API Keys
 4. **Test your connection** and discover models
-5. **Start using Open Notebook!**
+5. **Start using AegisNotebook!**
 
 ---
 

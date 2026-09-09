@@ -1,8 +1,8 @@
-# Open Notebook Architecture
+# AegisNotebook Architecture
 
 ## High-Level Overview
 
-Open Notebook follows a three-tier architecture with clear separation of concerns:
+AegisNotebook follows a three-tier architecture with clear separation of concerns:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -31,7 +31,7 @@ Open Notebook follows a three-tier architecture with clear separation of concern
 
 **Key Points:**
 - **v1.1+**: Next.js automatically proxies `/api/*` requests to the backend, simplifying reverse proxy setup
-- Your browser loads the frontend from port 8502
+- Your browser loads the frontend from port 8502 in Docker deployments, or port 3000 when running the Next.js development server directly.
 - The frontend needs to know where to find the API - when accessing remotely, set: `API_URL=http://your-server-ip:5055`
 - **Behind reverse proxy?** You only need to proxy to port 8502 now! See [Reverse Proxy Configuration](../5-CONFIGURATION/reverse-proxy.md)
 
@@ -39,7 +39,7 @@ Open Notebook follows a three-tier architecture with clear separation of concern
 
 ## Detailed Architecture
 
-Open Notebook is built on a **three-tier, async-first architecture** designed for scalability, modularity, and multi-provider AI flexibility. The system separates concerns across frontend, API, and database layers, with LangGraph powering intelligent workflows and Esperanto enabling seamless integration with 17 AI providers.
+AegisNotebook is built on a **three-tier, async-first architecture** designed for scalability, modularity, and multi-provider AI flexibility. The system separates concerns across frontend, API, and database layers, with LangGraph powering intelligent workflows and Esperanto enabling seamless integration with 22 AI providers and compatible endpoints.
 
 **Core Philosophy**:
 - Privacy-first: Users control their data and AI provider choice
@@ -52,9 +52,9 @@ Open Notebook is built on a **three-tier, async-first architecture** designed fo
 
 ## Three-Tier Architecture
 
-### Layer 1: Frontend (React/Next.js @ port 3000)
+### Layer 1: Frontend (React/Next.js @ port 3000 in development, 8502 in Docker)
 
-**Purpose**: Responsive, interactive user interface for research, notes, chat, and podcast management.
+**Purpose**: Responsive, interactive user interface for research, notes, chat, cross-notebook sessions, generated documents and podcast management.
 
 **Technology Stack**:
 - **Framework**: Next.js 15 with React 19
@@ -64,7 +64,7 @@ Open Notebook is built on a **three-tier, async-first architecture** designed fo
 - **Build Tool**: Webpack (bundled via Next.js)
 
 **Key Responsibilities**:
-- Render notebooks, sources, notes, chat sessions, and podcasts
+- Render notebooks, sources, notes, chat sessions, research sessions, generated documents and podcasts
 - Handle user interactions (create, read, update, delete operations)
 - Manage complex UI state (modals, file uploads, real-time search)
 - Stream responses from API (chat, podcast generation)
@@ -80,15 +80,15 @@ Open Notebook is built on a **three-tier, async-first architecture** designed fo
 **Component Architecture**:
 - `/src/app/`: Next.js App Router (pages, layouts)
 - `/src/components/`: Reusable React components (buttons, forms, cards)
-- `/src/hooks/`: Custom hooks (useNotebook, useChat, useSearch)
+- `/src/lib/hooks/`: Custom hooks (useNotebook, useChat, useSearch)
 - `/src/lib/`: Utility functions, API clients, validators
-- `/src/styles/`: Global CSS, Tailwind config
+- `/src/app/globals.css`: Global CSS and Tailwind entry point
 
 ---
 
 ### Layer 2: API (FastAPI @ port 5055)
 
-**Purpose**: RESTful backend exposing operations on notebooks, sources, notes, chat sessions, and AI models.
+**Purpose**: RESTful backend exposing operations on notebooks, sources, notes, chat sessions, research sessions, generated documents, skills and AI models.
 
 **Technology Stack**:
 - **Framework**: FastAPI 0.104+ (async Python web framework)
@@ -164,13 +164,18 @@ Response ← Pydantic serialization ← Service ← Result
 |-------|---------|-----------|
 | `notebook` | Research project container | id, name, description, archived, created, updated |
 | `source` | Content item (PDF, URL, text) | id, title, full_text, topics, asset, created, updated |
-| `source_embedding` | Vector embeddings for semantic search | id, source, embedding, chunk_text, chunk_index |
+| `source_embedding` | Vector embeddings for semantic search | id, source, embedding, content, order |
 | `note` | User-created research notes | id, title, content, note_type (human/ai), created, updated |
-| `chat_session` | Conversation session | id, notebook_id, title, messages (JSON), created, updated |
+| `chat_session` | Single-notebook conversation session | id, title, model_override, created, updated |
+| `research_session` | Cross-notebook conversation session | id, title, model_override, created, updated |
+| `generated_document` | Versioned multi-notebook output | id, title, content, version, language, embedding |
+| `skill` / `skill_knowledge` | Reusable global instructions and knowledge | title, instructions, enabled, embedding |
 | `transformation` | Custom transformation rules | id, name, description, prompt, created, updated |
 | `source_insight` | Transformation output | id, source_id, insight_type, content, created, updated |
 | `reference` | Relationship: source → notebook | out (source), in (notebook) |
 | `artifact` | Relationship: note → notebook | out (note), in (notebook) |
+| `scopes` | Relationship: research_session → notebook | out (session), in (notebook) |
+| `compiled_from` | Relationship: generated_document → notebook | out (document), in (notebook) |
 
 **Relationship Graph**:
 ```
@@ -185,17 +190,26 @@ Source
 
 ChatSession
   ├→ Notebook
-  └→ Messages (stored as JSON array)
+  └→ Messages (async SQLite checkpoint)
+
+ResearchSession
+  ├→ Notebook (one or more, via `scopes`)
+  ├→ Messages (LangGraph SQLite checkpoint)
+  └→ GeneratedDocument (via `source_session`)
+
+GeneratedDocument
+  └→ Notebook (one or more, via `compiled_from`)
 ```
 
 **Vector Search Capability**:
 - Embeddings stored natively in SurrealDB
-- Full-text search on `source.full_text` and `note.content`
+- Full-text search on source, note and generated-document content
 - Cosine similarity search on embedding vectors
-- Semantic search integrates with search endpoint
+- Semantic search integrates with the search endpoint and can be scoped to
+  selected notebooks
 
 **Connection Management**:
-- Async connection pooling (configurable size)
+- Async repository access; each database operation opens and closes its own connection
 - Transaction support for multi-record operations
 - Schema auto-validation via migrations
 - Query timeout protection (prevent infinite queries)
@@ -256,7 +270,7 @@ ChatSession
 ### Why Esperanto for AI Providers?
 
 **Esperanto Library**:
-- Unified interface to 17 providers (OpenAI, Anthropic, Google, Groq, Ollama, Mistral, DeepSeek, xAI, OpenRouter, Azure, Vertex, and more)
+- Unified interface to 22 providers (OpenAI, Anthropic, Google, Groq, Ollama, Mistral, DeepSeek, xAI, OpenRouter, Azure, Vertex, and more)
 - Multi-provider embeddings (OpenAI, Google, Ollama, Mistral, Voyage)
 - TTS/STT integration (OpenAI, Groq, ElevenLabs, Google)
 - Smart provider selection (fallback logic, cost optimization)
@@ -269,7 +283,8 @@ ChatSession
 
 ## LangGraph Workflows
 
-LangGraph is a state machine library that orchestrates multi-step AI workflows. Open Notebook uses five core workflows:
+LangGraph is a state machine library that orchestrates multi-step AI workflows.
+AegisNotebook uses the following workflows:
 
 ### 1. **Source Processing Workflow** (`open_notebook/graphs/source.py`)
 
@@ -345,7 +360,7 @@ Output (complete message)
 ```
 
 **Key Features**:
-- Message history persisted in SurrealDB (SqliteSaver checkpoint)
+- Message history persisted in an async SQLite checkpoint
 - Context building via `build_context_for_chat()` utility
 - Token counting to prevent overflow
 - Per-message model override support
@@ -435,6 +450,33 @@ Output (completion)
 ```
 
 **Used For**: Note title generation, content analysis, etc.
+
+### 6. **Research Session Workflow** (`open_notebook/graphs/session.py`)
+
+**Purpose**: Run a conversation across one or more notebooks and route each
+turn to Ask or document generation.
+
+**Flow**:
+```
+Session message
+  ↓
+Route by mode: ask or generate
+  ├→ Ask graph with notebook-scoped vector retrieval
+  └→ Document graph with context retrieval, drafting and persistence
+  ↓
+Persist session checkpoint and stream status/result events
+```
+
+**Invoked By**: Research Sessions API (`/research-sessions`)
+
+### 7. **Generated Document Workflow** (`open_notebook/graphs/generate_document.py`)
+
+**Purpose**: Retrieve material from selected notebooks, generate a complete
+architecture design document and persist a new version.
+
+The current prompt supports English, Swedish and bilingual English/Swedish
+output. Saving a document submits an asynchronous embedding job so the output
+can later participate in semantic search.
 
 ---
 
@@ -636,7 +678,7 @@ const source = await response.json();
 ### API → SurrealDB
 
 1. **SurrealQL queries** (similar to SQL)
-2. **Async driver** with connection pooling
+2. **Async repository access** with independently managed connections
 3. **Type-safe record IDs** (record_id syntax)
 4. **Transaction support** for multi-step operations
 
@@ -644,7 +686,7 @@ const source = await response.json();
 ```python
 # API
 result = await repo_query(
-    "SELECT * FROM source WHERE notebook = $notebook_id",
+    "SELECT * FROM source WHERE id IN (SELECT VALUE in FROM reference WHERE out = $notebook_id)",
     {"notebook_id": ensure_record_id(notebook_id)}
 )
 ```
@@ -687,13 +729,16 @@ status = await response.json()  # returns { status: "running|queued|completed|fa
 ### Core Schema Structure
 
 **Tables** (20+):
-- Notebooks (with soft-delete via `archived` flag)
+- Notebooks (with an `archived` state plus explicit delete)
 - Sources (content + metadata)
 - SourceEmbeddings (vector chunks)
 - Notes (user-created + AI-generated)
 - ChatSessions (conversation history)
 - Transformations (custom rules)
 - SourceInsights (transformation outputs)
+- ResearchSessions and their `scopes` edges
+- GeneratedDocuments and their `compiled_from` edges
+- Skills and global skill knowledge chunks
 - Relationships (notebook→source, notebook→note)
 
 **Migrations**:
@@ -717,8 +762,16 @@ Source
   → embedding (via source_embedding)
 
 ChatSession
-  → messages (JSON array in database)
-  → notebook_id (reference to Notebook)
+  → messages (async SQLite checkpoint)
+  → one notebook through `refers_to`
+
+ResearchSession
+  → scopes → Notebook (many:many)
+  → messages (async SQLite checkpoint)
+
+GeneratedDocument
+  → compiled_from → Notebook (many:many)
+  → source_session → ResearchSession (optional)
 
 Transformation
   → source_insight (one:many)
@@ -727,10 +780,10 @@ Transformation
 **Query Example** (get all sources in a notebook with counts):
 ```sql
 SELECT id, title,
-  count(<-reference.in) as note_count,
-  count(<-embedding.in) as embedded_chunks
+  count(<-reference.in) as source_count,
+  count(<-artifact.in) as note_count
 FROM source
-WHERE notebook = $notebook_id
+WHERE id IN (SELECT VALUE in FROM reference WHERE out = $notebook_id)
 ORDER BY updated DESC
 ```
 
@@ -746,13 +799,15 @@ All I/O operations are non-blocking to maximize concurrency and responsiveness.
 
 ### 2. **Multi-Provider from Day 1**
 
-Built-in support for 17 AI providers prevents vendor lock-in.
+Built-in support for 22 AI providers and compatible endpoints prevents vendor
+lock-in.
 
 **Trade-off**: Added complexity in ModelManager vs. flexibility and cost optimization.
 
 ### 3. **Graph-First Workflows**
 
-LangGraph state machines for complex multi-step operations (ask, chat, transformations).
+LangGraph state machines for complex multi-step operations (ask, chat,
+transformations, research sessions and document generation).
 
 **Trade-off**: Steeper learning curve vs. maintainable, debuggable workflows.
 
@@ -782,14 +837,15 @@ Async job submission (source processing, podcast generation) prevents request ti
 
 - **Record IDs use SurrealDB syntax** (table:id format, e.g., "notebook:abc123")
 - **ensure_record_id()** helper prevents malformed IDs
-- **Soft deletes** via `archived` field (data not removed, just marked inactive)
+- **Archive state** via `archived`; explicit notebook deletion cascades notes and
+  either deletes exclusive sources or unlinks shared sources
 - **Timestamps in ISO 8601 format** (created, updated fields)
 
 ### LangGraph Workflows
 
-- **State persistence** via SqliteSaver in `/data/sqlite-db/`
-- **No built-in timeout**; long workflows may block requests (use streaming for UX)
-- **Model fallback** automatic if primary provider unavailable
+- **State persistence** via async SQLite checkpoints in the configured data path
+- **Long-running turns** use streaming for responsive UX
+- **Model selection** is centralized through the provider registry and model provisioning layer
 - **Checkpoint IDs** must be unique per session (avoid collisions)
 
 ### AI Provider Integration
@@ -812,12 +868,12 @@ Async job submission (source processing, podcast generation) prevents request ti
 
 ### Optimization Strategies
 
-1. **Connection Pooling**: SurrealDB async driver with configurable pool size
-2. **Query Caching**: TanStack Query on frontend (client-side caching)
-3. **Embedding Reuse**: Vector search uses pre-computed embeddings
-4. **Chunking**: Sources split into chunks for better search relevance
-5. **Async Operations**: Non-blocking I/O for high concurrency
-6. **Lazy Loading**: Frontend requests only needed data (pagination)
+1. **Query Caching**: TanStack Query on frontend (client-side caching)
+2. **Embedding Reuse**: Vector search uses pre-computed embeddings and source fingerprints
+3. **Chunking**: Sources split into chunks for better search relevance
+4. **Async Operations**: Non-blocking I/O and background jobs for heavy work
+5. **Streaming**: Chat, Ask and research-session turns expose progress and tokens
+6. **Lazy Loading**: Frontend requests only needed data
 
 ### Bottlenecks
 
@@ -888,4 +944,4 @@ Async job submission (source processing, podcast generation) prevents request ti
 
 ## Summary
 
-Open Notebook's architecture provides a solid foundation for privacy-focused, AI-powered research. The separation of concerns (frontend/API/database), async-first design, and multi-provider flexibility enable rapid development and easy deployment. LangGraph workflows orchestrate complex AI tasks, while Esperanto abstracts provider details. The result is a scalable, maintainable system that puts users in control of their data and AI provider choice.
+AegisNotebook's architecture provides a solid foundation for privacy-focused, AI-powered research. The separation of concerns (frontend/API/database), async-first design, and multi-provider flexibility enable rapid development and easy deployment. LangGraph workflows orchestrate complex AI tasks, while Esperanto abstracts provider details. The result is a scalable, maintainable system that puts users in control of their data and AI provider choice.

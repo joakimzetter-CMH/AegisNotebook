@@ -1,6 +1,9 @@
-# Open Notebook - Start Here
+# AegisNotebook - Start Here
 
-**Open Notebook** is a privacy-focused AI research assistant. Upload documents, chat with AI, generate notes, and create podcasts—all with complete control over your data.
+**AegisNotebook** is a privacy-focused AI research assistant. Upload documents,
+chat with AI, generate notes, connect multiple notebooks in research sessions,
+create bilingual architecture documents and produce podcasts—all with complete
+control over your data.
 
 ## Choose Your Path
 
@@ -12,7 +15,7 @@
 ---
 
 ### ☁️ I want to use other cloud AI (Anthropic, Google, OpenRouter, etc.)
-**5 minutes to running.** Choose from 17+ AI providers.
+**5 minutes to running.** Choose from 22 AI providers and compatible endpoints.
 
 → [Cloud Providers Quick Start](quick-start-cloud.md)
 
@@ -35,20 +38,21 @@
 - 🎙️ **Create Podcasts**: Turn research into professional audio content
 - 🔍 **Search**: Full-text and semantic search across all content
 - ⚙️ **Transform**: Extract insights, analyze themes, create summaries
+- 🧭 **Research across notebooks**: Combine notebooks in one session and generate or refine documents
 
-## Why Open Notebook?
+## Why AegisNotebook?
 
-| Feature | Open Notebook | Notebook LM |
+| Feature | AegisNotebook | Notebook LM |
 |---------|---|---|
 | **Privacy** | Self-hosted, your control | Cloud, Google's servers |
-| **AI Choice** | 17+ providers | Google's models only |
+| **AI Choice** | 22 providers and compatible endpoints | Google's models only |
 | **Podcast Speakers** | 1-4 customizable | 2 only |
-| **Cost** | Completely free | Free (but your data) |
+| **Cost** | Free software; AI usage varies | Free tier + subscription |
 | **Offline** | Yes  | No |
 
 ## Prerequisites
 
-- **Docker**: All paths use Docker (free)
+- **Docker**: Recommended for the quickest setup; a native Windows path is also available
 - **AI Provider**: Either a cloud API key OR use free local models (Ollama)
 
 ---

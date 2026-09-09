@@ -87,7 +87,7 @@ services:
 
 ## Step 2: Start Services (2 min)
 
-Open terminal in the `open-notebook` folder:
+Open a terminal in the `AegisNotebook` folder:
 
 ```bash
 docker compose up -d
@@ -120,7 +120,7 @@ Open browser to:
 http://localhost:8502
 ```
 
-You should see the Open Notebook interface!
+You should see the AegisNotebook interface!
 
 ---
 
@@ -151,7 +151,7 @@ Your models are now available!
 3. Description: "Getting started"
 4. Click **Create**
 
-Done! You now have a fully working Open Notebook instance.
+Done! You now have a fully working AegisNotebook instance.
 
 ---
 
@@ -189,7 +189,7 @@ volumes:
 Then restart and pull a model:
 ```bash
 docker compose restart
-docker exec open-notebook-local-ollama-1 ollama pull mistral
+docker compose exec ollama ollama pull mistral
 ```
 
 Configure Ollama in the Settings UI:

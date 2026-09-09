@@ -21,7 +21,7 @@ docker ps | grep api
 
 # Check if API is responding
 curl http://localhost:5055/health
-# Should show: {"status":"ok"}
+# Should show: {"status":"healthy"}
 
 # Check if frontend is running
 docker ps | grep frontend
@@ -60,7 +60,8 @@ docker compose up -d
 cat .env | grep API_URL
 
 # Should match your frontend URL:
-# Frontend: http://localhost:8502
+# Docker frontend: http://localhost:8502
+# Native/dev frontend: http://localhost:3000
 # API_URL: http://localhost:5055
 
 # If wrong, fix it:
@@ -267,13 +268,13 @@ ping -c 100 google.com | grep "packet loss"
 
 ## Different Machine / Remote Access
 
-**You want to access Open Notebook from another computer**
+**You want to access AegisNotebook from another computer**
 
 **Solution:**
 
 ### Step 1: Get Your Machine IP
 ```bash
-# On the server running Open Notebook:
+# On the server running AegisNotebook:
 ifconfig | grep "inet "
 # or
 hostname -I
@@ -291,9 +292,9 @@ docker compose restart
 
 ### Step 3: Access from Other Machine
 ```bash
-# In browser on other machine:
+# In browser on other machine (Docker deployment):
 http://192.168.1.100:8502
-# (or your server IP)
+# Native/dev deployments normally use port 3000.
 ```
 
 ### Step 4: Verify Port is Exposed
@@ -302,7 +303,7 @@ http://192.168.1.100:8502
 docker compose ps
 
 # Should show port mapping:
-# 0.0.0.0:8502->8502/tcp
+# 0.0.0.0:8502->8502/tcp  (Docker frontend)
 # 0.0.0.0:5055->5055/tcp
 ```
 

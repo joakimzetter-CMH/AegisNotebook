@@ -1,6 +1,6 @@
 # Quick Start - OpenAI (5 minutes)
 
-Get Open Notebook running with OpenAI's GPT models. Fast, powerful, and simple.
+Get AegisNotebook running with OpenAI's GPT models. Fast, powerful, and simple.
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ Get Open Notebook running with OpenAI's GPT models. Fast, powerful, and simple.
 
 ## Step 1: Create Configuration (1 min)
 
-Create a new folder `open-notebook` and add this file:
+Create a new folder `AegisNotebook` and add this file:
 
 **docker-compose.yml**:
 ```yaml
@@ -62,7 +62,7 @@ services:
 
 ## Step 2: Start Services (1 min)
 
-Open terminal in your `open-notebook` folder:
+Open a terminal in your `AegisNotebook` folder:
 
 ```bash
 docker compose up -d
@@ -72,14 +72,14 @@ Wait 15-20 seconds for services to start.
 
 ---
 
-## Step 3: Access Open Notebook (instant)
+## Step 3: Access AegisNotebook (instant)
 
 Open your browser:
 ```
 http://localhost:8502
 ```
 
-You should see the Open Notebook interface!
+You should see the AegisNotebook interface!
 
 ---
 

@@ -205,7 +205,7 @@ lsof -i :5055
 ```bash
 # Test API directly
 curl http://localhost:5055/health
-# Should return: {"status":"ok"}
+# Should return: {"status":"healthy"}
 ```
 
 **Slow performance?**

@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import {
-  Bricolage_Grotesque,
-  Instrument_Sans,
-  Spline_Sans_Mono,
-} from "next/font/google";
+import { DM_Sans, Space_Grotesk, Spline_Sans_Mono } from "next/font/google";
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -14,15 +10,15 @@ import { ConnectionGuard } from "@/components/common/ConnectionGuard";
 import { themeScript } from "@/lib/theme-script";
 import { I18nProvider } from "@/components/providers/I18nProvider";
 
-const instrumentSans = Instrument_Sans({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-instrument-sans",
+  variable: "--font-dm-sans",
 });
 
-const bricolageGrotesque = Bricolage_Grotesque({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["600", "700"],
-  variable: "--font-bricolage",
+  weight: ["500", "600", "700"],
+  variable: "--font-space-grotesk",
 });
 
 const splineSansMono = Spline_Sans_Mono({
@@ -31,7 +27,7 @@ const splineSansMono = Spline_Sans_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Open Notebook",
+  title: "Aegis Notebook",
   description: "Privacy-focused research and knowledge management",
 };
 
@@ -46,7 +42,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={`${instrumentSans.variable} ${bricolageGrotesque.variable} ${splineSansMono.variable} font-sans`}
+        className={`${dmSans.variable} ${spaceGrotesk.variable} ${splineSansMono.variable} font-sans`}
       >
         <ErrorBoundary>
           <ThemeProvider>

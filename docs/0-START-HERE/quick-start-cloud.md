@@ -1,6 +1,6 @@
 # Quick Start - Cloud AI Providers (5 minutes)
 
-Get Open Notebook running with **Anthropic, Google, Groq, or other cloud providers**. Same simplicity as OpenAI, with more choices.
+Get AegisNotebook running with **Anthropic, Google, Groq, or other cloud providers**. Same simplicity as OpenAI, with more choices.
 
 ## Prerequisites
 
@@ -19,7 +19,7 @@ Get Open Notebook running with **Anthropic, Google, Groq, or other cloud provide
 
 ## Step 1: Create Configuration (1 min)
 
-Create a new folder `open-notebook` and add this file:
+Create a new folder `AegisNotebook` and add this file:
 
 **docker-compose.yml**:
 ```yaml
@@ -64,7 +64,7 @@ services:
 
 ## Step 2: Start Services (1 min)
 
-Open terminal in your `open-notebook` folder:
+Open a terminal in your `AegisNotebook` folder:
 
 ```bash
 docker compose up -d
@@ -74,14 +74,14 @@ Wait 15-20 seconds for services to start.
 
 ---
 
-## Step 3: Access Open Notebook (instant)
+## Step 3: Access AegisNotebook (instant)
 
 Open your browser:
 ```
 http://localhost:8502
 ```
 
-You should see the Open Notebook interface!
+You should see the AegisNotebook interface!
 
 ---
 

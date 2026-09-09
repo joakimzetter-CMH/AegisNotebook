@@ -5,7 +5,7 @@ Clone the repository and run locally. **For developers and contributors.**
 ## Prerequisites
 
 - **Python 3.11+** - [Download](https://www.python.org/)
-- **Node.js 18+** - [Download](https://nodejs.org/)
+- **Node.js 20+** - [Download](https://nodejs.org/)
 - **Git** - [Download](https://git-scm.com/)
 - **Docker** (for SurrealDB) - [Download](https://docker.com/)
 - **uv** (Python package manager) - `curl -LsSf https://astral.sh/uv/install.sh | sh`
@@ -16,13 +16,12 @@ Clone the repository and run locally. **For developers and contributors.**
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/lfnovo/open-notebook.git
-cd open-notebook
+git clone <repository-url> AegisNotebook
+cd AegisNotebook
 
-# If you forked it:
-git clone https://github.com/YOUR_USERNAME/open-notebook.git
-cd open-notebook
-git remote add upstream https://github.com/lfnovo/open-notebook.git
+# If you are working from your own fork, clone that URL instead.
+git clone <your-fork-url> AegisNotebook
+cd AegisNotebook
 ```
 
 ### 2. Install Python Dependencies
@@ -38,8 +37,8 @@ If you prefer using **Conda** to manage your environments, follow these steps in
 
 ```bash
 # Create and activate the environment
-conda create -n open-notebook python=3.11 -y
-conda activate open-notebook
+conda create -n aegis-notebook python=3.11 -y
+conda activate aegis-notebook
 
 # Install uv inside conda to maintain compatibility with the Makefile
 conda install -c conda-forge uv nodejs -y

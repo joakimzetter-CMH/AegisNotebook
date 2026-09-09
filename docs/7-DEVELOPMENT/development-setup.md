@@ -1,6 +1,6 @@
 # Local Development Setup
 
-This guide walks you through setting up Open Notebook for local development. Follow these steps to get the full stack running on your machine.
+This guide walks you through setting up AegisNotebook for local development. Follow these steps to get the full stack running on your machine.
 
 ## Prerequisites
 
@@ -10,18 +10,15 @@ Before you start, ensure you have the following installed:
 - **uv** (recommended) or **pip** - Install from: https://github.com/astral-sh/uv
 - **SurrealDB** - Via Docker or binary (see below)
 - **Docker** (optional) - For containerized database
-- **Node.js 18+** (optional) - For frontend development
+- **Node.js 20+** (optional) - For frontend development
 - **Git** - For version control
 
 ## Step 1: Clone and Initial Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/lfnovo/open-notebook.git
-cd open-notebook
-
-# Add upstream remote for keeping your fork updated
-git remote add upstream https://github.com/lfnovo/open-notebook.git
+git clone <repository-url> AegisNotebook
+cd AegisNotebook
 ```
 
 ## Step 2: Install Python Dependencies
@@ -196,7 +193,7 @@ Open your browser to: http://localhost:3000
 After setup, verify everything is working:
 
 - [ ] **SurrealDB**: `curl http://localhost:8000/` returns content
-- [ ] **API**: `curl http://localhost:5055/health` returns `{"status": "ok"}`
+- [ ] **API**: `curl http://localhost:5055/health` returns `{"status": "healthy"}`
 - [ ] **API Docs**: `open http://localhost:5055/docs` works
 - [ ] **Database**: API logs show migrations completing
 - [ ] **Frontend** (optional): `http://localhost:3000` loads

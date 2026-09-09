@@ -1,6 +1,6 @@
 # Interface Overview - Finding Your Way Around
 
-Open Notebook uses a clean three-panel layout. This guide shows you where everything is.
+AegisNotebook uses a clean three-panel layout. This guide shows you where everything is.
 
 ---
 
@@ -32,6 +32,7 @@ The top navigation takes you to main sections:
 |------|------|--------------|
 | **Notebooks** | Main workspace | Your research projects |
 | **Search** | Ask & Search | Query across all notebooks |
+| **Research Sessions** | Cross-notebook workspaces | Created from **New Session** on the Notebooks page; ask questions and generate documents across selected notebooks |
 | **Podcasts** | Audio generation | Manage podcast profiles |
 | **Models** | AI configuration | Set up providers and models |
 | **Settings** | Preferences | App configuration |

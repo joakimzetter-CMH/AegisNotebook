@@ -206,11 +206,11 @@ function Sheet() {
       <SectionTitle>Typography</SectionTitle>
       <div className="space-y-3">
         <div className="font-display text-2xl font-bold">
-          Display — Bricolage Grotesque 700
+          Display — Space Grotesk 700
         </div>
         <div className="text-sm">
-          Body — Instrument Sans. Reading text stays on neutral surfaces;
-          color is information, never decoration.
+          Body — DM Sans. Reading text stays on neutral surfaces; color is
+          information, never decoration.
         </div>
         <div className="font-mono text-xs">
           Mono — Spline Sans Mono · for data, not prose · 128 chunks · 04:32

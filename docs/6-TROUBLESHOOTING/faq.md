@@ -1,14 +1,14 @@
 # Frequently Asked Questions
 
-Common questions about Open Notebook usage, configuration, and best practices.
+Common questions about AegisNotebook usage, configuration, and best practices.
 
 ---
 
 ## General Usage
 
-### What is Open Notebook?
+### What is AegisNotebook?
 
-Open Notebook is an open-source, privacy-focused alternative to Google's Notebook LM. It allows you to:
+AegisNotebook is an open-source, privacy-focused alternative to Google's Notebook LM. It allows you to:
 - Create and manage research notebooks
 - Chat with your documents using AI
 - Generate podcasts from your content
@@ -18,11 +18,11 @@ Open Notebook is an open-source, privacy-focused alternative to Google's Noteboo
 ### How is it different from Google Notebook LM?
 
 **Privacy**: Your data stays local by default. Only your chosen AI providers receive queries.
-**Flexibility**: Support for 17+ AI providers (OpenAI, Anthropic, Google, local models, etc.)
+**Flexibility**: Support for 22 AI providers and compatible endpoints (OpenAI, Anthropic, Google, local models, etc.)
 **Customization**: Open source, so you can modify and extend functionality
 **Control**: You control your data, models, and processing
 
-### Can I use Open Notebook offline?
+### Can I use AegisNotebook offline?
 
 **Partially**: The application runs locally, but requires internet for:
 - AI model API calls (unless using local models like Ollama)
@@ -99,17 +99,22 @@ Open Notebook is an open-source, privacy-focused alternative to Google's Noteboo
 
 ### Where is my data stored?
 
-**Local storage**: By default, all data is stored locally:
+**Local storage**: By default, all data is stored locally. Native/source
+deployments use `data/` and `surreal_data/`; the root Docker Compose file uses
+`notebook_data/` and `surreal_data/`:
 - Database: SurrealDB files in `surreal_data/`
-- Uploads: Files in `data/uploads/`
-- Podcasts: Generated audio in `data/podcasts/`
+- Uploads: Files in the deployment's data folder (`data/uploads/` or `notebook_data/uploads/`)
+- Podcasts: Generated audio in the deployment's data folder
 - No external data transmission (except to chosen AI providers)
 
 ### How do I backup my data?
 
 ```bash
-# Create backup
+# Create backup (native/source deployment)
 tar -czf backup-$(date +%Y%m%d).tar.gz data/ surreal_data/
+
+# Root Docker Compose deployment: use notebook_data/ instead of data/
+# tar -czf backup-$(date +%Y%m%d).tar.gz notebook_data/ surreal_data/
 
 # Restore backup
 tar -xzf backup-20240101.tar.gz
@@ -124,8 +129,9 @@ tar -xzf backup-20240101.tar.gz
 
 ### What happens if I delete a notebook?
 
-**Soft deletion**: Notebooks are marked as archived, not permanently deleted.
-**Recovery**: Archived notebooks can be restored from the database.
+**Notebook deletion**: The UI archives notebooks for normal organization, while
+the explicit delete operation removes the notebook and its notebook-owned
+relationships. Shared sources can be unlinked without deleting the source.
 
 ---
 
@@ -165,14 +171,14 @@ tar -xzf backup-20240101.tar.gz
 
 ## Technical Questions
 
-### Can I use Open Notebook programmatically?
+### Can I use AegisNotebook programmatically?
 
-**Yes**: Open Notebook provides a REST API:
+**Yes**: AegisNotebook provides a REST API:
 - Full API documentation at `http://localhost:5055/docs`
 - Support for all UI functionality
 - Authentication via password header
 
-### Can I run Open Notebook in production?
+### Can I run AegisNotebook in production?
 
 **Yes**: Designed for production use with:
 - Docker deployment

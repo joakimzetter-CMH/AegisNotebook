@@ -88,7 +88,7 @@ templates playground.
 ---
 
 ### `docker-compose-dev.yml` - Development Setup
-**Use this if:** You're contributing to Open Notebook or developing custom features
+**Use this if:** You're contributing to AegisNotebook or developing custom features
 
 **Features:**
 - Hot-reload for code changes
@@ -98,7 +98,7 @@ templates playground.
 
 **Prerequisites:**
 - Python 3.11+
-- Node.js 18+
+- Node.js 20+
 - uv (Python package manager)
 
 **Setup:**

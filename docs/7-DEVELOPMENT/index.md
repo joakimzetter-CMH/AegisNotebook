@@ -1,6 +1,6 @@
 # Development
 
-Welcome to the Open Notebook development documentation! Whether you're contributing code, understanding our architecture, or maintaining the project, you'll find guidance here.
+Welcome to the AegisNotebook development documentation! Whether you're contributing code, understanding our architecture, or maintaining the project, you'll find guidance here.
 
 ## 🎯 Pick Your Path
 
@@ -39,6 +39,7 @@ For deeper dives into specific subsystems:
 - **[Podcasts](podcasts.md)** - Profile system, model registry, job lifecycle
 - **[Prompts](prompts.md)** - Prompt engineering patterns
 - **[Frontend](frontend.md)** - Next.js layers and data flows
+- **[Research Sessions](research-sessions.md)** - Cross-notebook sessions and generated documents
 
 Normative rules for coding agents (and humans in a hurry) live in the `AGENTS.md` files at the
 repo root, `open_notebook/`, and `frontend/`.
@@ -75,6 +76,7 @@ repo root, `open_notebook/`, and `frontend/`.
 | [Podcasts](podcasts.md) | Understanding system | Podcast profiles and job lifecycle |
 | [Prompts](prompts.md) | Understanding system | Prompt engineering patterns |
 | [Frontend](frontend.md) | Understanding system | Next.js architecture and data flows |
+| [Research Sessions](research-sessions.md) | Understanding system | Cross-notebook research and document generation |
 | [Design Principles](design-principles.md) | All developers | Engineering practices and anti-patterns |
 | [VISION.md](../../VISION.md) | All developers | Product identity and current posture |
 | [Decision Records](decisions/README.md) | All developers | ADRs/PDRs — why things are the way they are |

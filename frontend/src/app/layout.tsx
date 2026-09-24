@@ -27,7 +27,7 @@ const splineSansMono = Spline_Sans_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cortex NoteBookLLM",
+  title: "Cortex NoteBookLM",
   description: "Privacy-focused research and knowledge management",
 };
 

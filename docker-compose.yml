@@ -47,6 +47,14 @@ services:
       - OPENAI_COMPATIBLE_API_KEY=${OPENAI_COMPATIBLE_API_KEY:-cortex-marvin-internal-key}
       - OPENAI_COMPATIBLE_MODEL=${OPENAI_COMPATIBLE_MODEL:-marvin}
 
+      # OPTIONAL: heavy extraction runtimes, installed on first startup when
+      # enabled (downloads are cached on the ./notebook_data volume, so only the
+      # first boot is slow). See docs/5-CONFIGURATION/environment-reference.md.
+      # - OPEN_NOTEBOOK_ENABLE_DOCLING=true    # Docling engine + OCR + image sources (large ML stack)
+      # - OPEN_NOTEBOOK_ENABLE_CRAWL4AI=true   # local Crawl4AI (bundles a Chromium browser)
+      # - CRAWL4AI_API_URL=http://crawl4ai:11235  # use a remote Crawl4AI server instead (no local install)
+      # - CRAWL4AI_API_TOKEN=${CRAWL4AI_API_TOKEN}  # bearer token for that server (required by Crawl4AI >= 0.9.0)
+
       # Remote Ingress Subpath Configuration
       - API_URL=${API_URL:-/notebook}
       - NEXT_PUBLIC_BASE_PATH=${NEXT_PUBLIC_BASE_PATH:-/notebook}

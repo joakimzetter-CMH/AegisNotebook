@@ -23,4 +23,4 @@ the template generates one and stores it in the app service environment as
 `OPEN_NOTEBOOK_PASSWORD`.
 
 After deployment, open the EasyPanel domain and configure AI providers from
-AegisNotebook's Settings > API Keys page.
+AegisNotebook's Manage > Models page.

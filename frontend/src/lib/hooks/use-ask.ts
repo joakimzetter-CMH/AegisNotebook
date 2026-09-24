@@ -14,6 +14,11 @@ interface AskModels {
   finalAnswer: string
 }
 
+interface AskOptions {
+  /** Notebook ids to scope the search to; empty = whole knowledge base. */
+  notebookIds?: string[]
+}
+
 interface StrategyData {
   reasoning: string
   searches: Array<{ term: string; instructions: string }>
@@ -52,11 +57,9 @@ export function useAsk() {
   const mountedRef = useRef(true)
 
   useEffect(() => {
-    // Reset on every (re-)mount, not just via the useRef initializer - under
-    // React StrictMode's dev-only mount->cleanup->mount double-invoke, the
-    // cleanup below runs once immediately, and without this the ref would be
-    // stuck at `false` for the rest of the component's real lifetime, making
-    // every `if (mountedRef.current) ...` guard below silently no-op forever.
+    // Must be re-set on every mount: React Strict Mode mounts, unmounts and
+    // remounts in development, and the cleanup below would otherwise leave this
+    // false forever, making every mountedRef guard dead code.
     mountedRef.current = true
     return () => {
       mountedRef.current = false
@@ -102,7 +105,7 @@ export function useAsk() {
     }
   }, [clearStreamTimeout])
 
-  const sendAsk = useCallback(async (question: string, models: AskModels) => {
+  const sendAsk = useCallback(async (question: string, models: AskModels, options: AskOptions = {}) => {
     // Validate inputs
     if (!question.trim()) {
       toast.error(t('apiErrors.pleaseEnterQuestion'))
@@ -138,7 +141,10 @@ export function useAsk() {
         question,
         strategy_model: models.strategy,
         answer_model: models.answer,
-        final_answer_model: models.finalAnswer
+        final_answer_model: models.finalAnswer,
+        ...(options.notebookIds && options.notebookIds.length > 0
+          ? { notebook_ids: options.notebookIds }
+          : {})
       }, signal)
 
       if (!response) {

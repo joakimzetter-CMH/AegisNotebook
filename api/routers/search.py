@@ -1,5 +1,5 @@
 import json
-from typing import AsyncGenerator, List, Optional
+from typing import AsyncGenerator, List
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
@@ -7,7 +7,11 @@ from loguru import logger
 
 from api.models import AskRequest, AskResponse, SearchRequest, SearchResponse
 from open_notebook.ai.models import Model, model_manager
-from open_notebook.domain.notebook import text_search, vector_search
+from open_notebook.domain.notebook import (
+    resolve_notebook_scope,
+    text_search,
+    vector_search,
+)
 from open_notebook.exceptions import (
     DatabaseOperationError,
     InvalidInputError,
@@ -22,6 +26,8 @@ router = APIRouter()
 async def search_knowledge_base(search_request: SearchRequest):
     """Search the knowledge base using text or vector search."""
     try:
+        notebook_ids = await resolve_notebook_scope(search_request.scope_notebook_ids)
+
         if search_request.type == "vector":
             # Check if embedding model is available for vector search
             if not await model_manager.get_embedding_model():
@@ -36,6 +42,7 @@ async def search_knowledge_base(search_request: SearchRequest):
                 source=search_request.search_sources,
                 note=search_request.search_notes,
                 minimum_score=search_request.minimum_score,
+                notebook_ids=notebook_ids,
             )
         else:
             # Text search
@@ -44,6 +51,7 @@ async def search_knowledge_base(search_request: SearchRequest):
                 results=search_request.limit,
                 source=search_request.search_sources,
                 note=search_request.search_notes,
+                notebook_ids=notebook_ids,
             )
 
         return SearchResponse(
@@ -71,7 +79,7 @@ async def stream_ask_response(
     strategy_model: Model,
     answer_model: Model,
     final_answer_model: Model,
-    notebook_ids: Optional[List[str]] = None,
+    notebook_ids: List[str],
 ) -> AsyncGenerator[str, None]:
     """Stream the ask response as Server-Sent Events."""
     try:
@@ -128,6 +136,10 @@ async def stream_ask_response(
 async def ask_knowledge_base(ask_request: AskRequest):
     """Ask the knowledge base a question using AI models."""
     try:
+        # Cheapest check first: a malformed or unknown scope fails before any
+        # model lookup or embedding check can mask it.
+        notebook_ids = await resolve_notebook_scope(ask_request.scope_notebook_ids)
+
         # Validate models exist
         strategy_model = await Model.get(ask_request.strategy_model)
         answer_model = await Model.get(ask_request.answer_model)
@@ -163,7 +175,7 @@ async def ask_knowledge_base(ask_request: AskRequest):
                 strategy_model,
                 answer_model,
                 final_answer_model,
-                ask_request.notebook_ids,
+                notebook_ids,
             ),
             media_type="text/event-stream",
             headers={
@@ -186,6 +198,10 @@ async def ask_knowledge_base(ask_request: AskRequest):
 async def ask_knowledge_base_simple(ask_request: AskRequest):
     """Ask the knowledge base a question and return a simple response (non-streaming)."""
     try:
+        # Cheapest check first: a malformed or unknown scope fails before any
+        # model lookup or embedding check can mask it.
+        notebook_ids = await resolve_notebook_scope(ask_request.scope_notebook_ids)
+
         # Validate models exist
         strategy_model = await Model.get(ask_request.strategy_model)
         answer_model = await Model.get(ask_request.answer_model)
@@ -219,9 +235,7 @@ async def ask_knowledge_base_simple(ask_request: AskRequest):
         # LangGraph accepts a partial state dict at runtime, but its typed
         # overloads require the full state type (langgraph typing limitation).
         async for chunk in ask_graph.astream(  # type: ignore[call-overload]
-            input=dict(
-                question=ask_request.question, notebook_ids=ask_request.notebook_ids
-            ),
+            input=dict(question=ask_request.question, notebook_ids=notebook_ids),
             config=dict(
                 configurable=dict(
                     strategy_model=strategy_model.id,

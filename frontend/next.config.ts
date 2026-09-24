@@ -15,7 +15,8 @@ const nextConfig: NextConfig = {
   output: "standalone",
   basePath: basePath,
 
-  // Redirect root to /notebooks if requested without basePath
+  // Redirect root to /notebooks if requested without basePath,
+  // and redirect legacy credentials route to canonical Models route
   async redirects() {
     return [
       {
@@ -23,6 +24,11 @@ const nextConfig: NextConfig = {
         destination: `${basePath}/notebooks`,
         basePath: false,
         permanent: false,
+      },
+      {
+        source: '/settings/api-keys',
+        destination: '/settings/models',
+        permanent: true,
       },
     ];
   },
@@ -60,18 +66,6 @@ const nextConfig: NextConfig = {
       {
         source: '/api/:path*',
         destination: `${internalApiUrl}/api/:path*`,
-      },
-    ]
-  },
-
-  // Redirect the legacy credentials route to the canonical "Models" route so
-  // existing bookmarks and links keep working.
-  async redirects() {
-    return [
-      {
-        source: '/settings/api-keys',
-        destination: '/settings/models',
-        permanent: true,
       },
     ]
   },

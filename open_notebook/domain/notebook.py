@@ -943,9 +943,7 @@ class GeneratedDocument(ObjectModel):
                 f"{self.id}: {e}. Continuing with document deletion."
             )
         return await super().delete()
- 
- 
- async def resolve_notebook_scope(notebook_ids: List[str]) -> List[str]:
+async def resolve_notebook_scope(notebook_ids: List[str]) -> List[str]:
     """Validate a notebook scope before it reaches text_search / vector_search.
 
     Every id must be a well-formed `notebook:<key>` id naming an existing
@@ -1002,9 +1000,7 @@ def _scope_record_ids(notebook_ids: Optional[List[str]]) -> Optional[List[Record
     if not notebook_ids:
         return None
     return [ensure_record_id(nb_id) for nb_id in notebook_ids]
- 
- 
- async def text_search(
+async def text_search(
     keyword: str,
     results: int,
     source: bool = True,

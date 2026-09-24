@@ -1,0 +1,9 @@
+-- Revert Marvin AI seed
+DELETE model:marvin;
+
+UPDATE open_notebook:default_models SET
+    default_chat_model = "",
+    default_transformation_model = "",
+    default_tools_model = "",
+    large_context_model = "";
+

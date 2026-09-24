@@ -40,6 +40,7 @@ import {
   Plus,
   Wrench,
   Command,
+  Terminal,
 } from 'lucide-react'
 
 const getNavigation = (t: TFunction) => [
@@ -54,6 +55,12 @@ const getNavigation = (t: TFunction) => [
     items: [
       { name: t('navigation.notebooks'), href: '/notebooks', icon: Book, iconClass: 'text-teal' },
       { name: t('navigation.askAndSearch'), href: '/search', icon: Search, iconClass: undefined },
+    ],
+  },
+  {
+    title: 'Develop',
+    items: [
+      { name: 'Agent IDE', href: '/ide', icon: Terminal, iconClass: 'text-cyan-400' },
     ],
   },
   {

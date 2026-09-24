@@ -69,11 +69,17 @@ async function fetchConfig(): Promise<AppConfig> {
   // Note: Endpoint is at /config (not /api/config) to avoid reverse proxy conflicts
   let runtimeApiUrl: string | null = null
   try {
-    if (isDev) console.log('🔧 [Config] Attempting to fetch runtime config from /config endpoint...')
-    const runtimeResponse = await fetch('/config', {
-      cache: 'no-store',
-    })
-    if (runtimeResponse.ok) {
+    const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '/notebook'
+    let runtimeResponse: Response | null = null
+    try {
+      runtimeResponse = await fetch(`${basePath}/config`, { cache: 'no-store' })
+      if (!runtimeResponse.ok) {
+        runtimeResponse = await fetch('/config', { cache: 'no-store' })
+      }
+    } catch {
+      runtimeResponse = await fetch('/config', { cache: 'no-store' })
+    }
+    if (runtimeResponse && runtimeResponse.ok) {
       const runtimeData = await runtimeResponse.json()
       runtimeApiUrl = runtimeData.apiUrl
       // Treat empty string as "not set" to allow fallback to env var or default

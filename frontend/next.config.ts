@@ -8,9 +8,24 @@ const allowedDevOrigins = process.env.NEXT_ALLOWED_DEV_ORIGINS
   ? process.env.NEXT_ALLOWED_DEV_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean)
   : undefined;
 
+const basePath = process.env.BASE_PATH || process.env.NEXT_PUBLIC_BASE_PATH || '/notebook';
+
 const nextConfig: NextConfig = {
   // Enable standalone output for optimized Docker deployment
   output: "standalone",
+  basePath: basePath,
+
+  // Redirect root to /notebooks if requested without basePath
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: `${basePath}/notebooks`,
+        basePath: false,
+        permanent: false,
+      },
+    ];
+  },
 
   // Next's default gzip compression buffers response bodies before
   // flushing, which defeats SSE streaming (/chat/.../stream,

@@ -1,0 +1,12 @@
+-- Seed Marvin AI as the primary native brain for AegisNotebook
+UPSERT model:marvin SET
+    name = "marvin",
+    provider = "openai_compatible",
+    type = "language";
+
+UPDATE open_notebook:default_models SET
+    default_chat_model = "model:marvin",
+    default_transformation_model = "model:marvin",
+    default_tools_model = "model:marvin",
+    large_context_model = "model:marvin";
+

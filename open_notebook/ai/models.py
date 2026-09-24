@@ -233,6 +233,17 @@ class ModelManager:
                 # request-time re-validation the credential-linked path gets.
                 await _revalidate_config_urls(config, model.provider)
 
+        # openai_compatible / Marvin: ensure base_url and api_key fallback to env vars
+        # so Marvin AI acts as native embedded brain out of the box
+        if model.provider == "openai_compatible" and not config.get("base_url"):
+            api_key = os.environ.get("OPENAI_COMPATIBLE_API_KEY", "cortex-marvin-internal-key")
+            base_url = os.environ.get("OPENAI_COMPATIBLE_BASE_URL", "http://host.docker.internal:8888/v1")
+            if api_key and not config.get("api_key"):
+                config["api_key"] = api_key
+            if base_url:
+                config["base_url"] = base_url
+                await _revalidate_config_urls(config, model.provider)
+
         # Merge any additional kwargs (e.g. temperature)
         config.update(kwargs)
 
@@ -356,6 +367,13 @@ class ModelManager:
             model_id = defaults.large_context_model or defaults.default_chat_model
 
         if not model_id:
+            if model_type in ("chat", "transformation", "tools", "large_context"):
+                try:
+                    marvin_model = await Model.get("model:marvin")
+                    if marvin_model:
+                        return await self.get_model("model:marvin", **kwargs)
+                except Exception:
+                    pass
             logger.warning(
                 f"No default model configured for type '{model_type}'. "
                 f"Please go to Settings → Models and set a default model."

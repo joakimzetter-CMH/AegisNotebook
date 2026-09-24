@@ -62,7 +62,7 @@ function extractHostname(hostHeader: string): string | null {
  */
 export async function GET(request: NextRequest) {
   // Priority 1: Check if API_URL is explicitly set
-  const envApiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
+  const envApiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BASE_PATH || '/notebook'
 
   if (envApiUrl) {
     return NextResponse.json({
